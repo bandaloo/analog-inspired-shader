@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+  <link rel="stylesheet" href="stylesheet.css" />
   <head>
     <style>
       body {
@@ -9,16 +10,38 @@
   </head>
   <body>
     <canvas id="gl"></canvas>
-    <div>
+    <div class="controlbox">
       <!-- first rgb selector -->
-      <input type="range" min="0.0" max="255.0" value="255.0" id="red1" />
-      <input type="range" min="0.0" max="255.0" value="0.0" id="green1" />
-      <input type="range" min="0.0" max="255.0" value="0.0" id="blue1" />
-
+      <h2>color 1 rgb</h2>
+      <div>
+        <input type="range" min="0.0" max="255.0" value="255.0" id="red1" />
+        <input type="range" min="0.0" max="255.0" value="0.0" id="green1" />
+        <input type="range" min="0.0" max="255.0" value="0.0" id="blue1" />
+      </div>
       <!-- second rgb selector -->
-      <input type="range" min="0.0" max="255.0" value="255.0" id="red1" />
-      <input type="range" min="0.0" max="255.0" value="0.0" id="green1" />
-      <input type="range" min="0.0" max="255.0" value="0.0" id="blue1" />
+      <h2>color 2 rgb</h2>
+      <div>
+        <input type="range" min="0.0" max="255.0" value="0.0" id="red2" />
+        <input type="range" min="0.0" max="255.0" value="0.0" id="green2" />
+        <input type="range" min="0.0" max="255.0" value="255.0" id="blue2" />
+      </div>
+      <h2>noise speed and size</h2>
+      <div>
+        <input
+          type="range"
+          min="0.0"
+          max="255.0"
+          value="255.0"
+          id="noisespeed"
+        />
+        <input
+          type="range"
+          min="0.0"
+          max="255.0"
+          value="255.0"
+          id="noisesize"
+        />
+      </div>
     </div>
   </body>
   <!-- vertex shader, as simple as possible -->
@@ -54,6 +77,9 @@
     uniform mediump vec3 u_color1;
     uniform mediump vec3 u_color2;
 
+    uniform mediump float u_noiseSpeed;
+    uniform mediump float u_noiseSize;
+
     const float pi = 3.14159265358979323846;
 
     float sinOscillator(float c, float freq) {
@@ -78,7 +104,7 @@
       vec2 p = gl_FragCoord.xy / u_resolution.xy;
 
       vec3 color1 = u_color1;
-      vec3 color2 = vec3(0.0, 0.0, 1.0);
+      vec3 color2 = u_color2;
 
       float hFrequency = 2.0;
       float vFrequency = 2.0;
@@ -86,8 +112,8 @@
       float sinFreqScalar = 4.0;
       float squareFreqScalar = 1.0;
 
-      float triangleFreqScalar = 8.0;
-      float noiseSpeed = 0.001;
+      float triangleFreqScalar = u_noiseSize;
+      float noiseSpeed = u_noiseSpeed;
       float noiseLevel = 1.0;
 
       // horizontal sin waves used for luma
@@ -122,7 +148,7 @@
 
   <script type="text/javascript">
     // "global" variables
-    let gl, uTime, uColor1, uColor2;
+    let gl, uTime, uColor1, uColor2, uNoiseSpeed, uNoiseSize;
 
     window.onload = function() {
       const canvas = document.getElementById("gl");
@@ -187,8 +213,11 @@
       const uRes = gl.getUniformLocation(program, "u_resolution");
       gl.uniform2f(uRes, window.innerWidth, window.innerHeight);
 
-      // find a pointer to the uniform for the first color
+      // find a pointer to the uniform for the colors
       uColor1 = gl.getUniformLocation(program, "u_color1");
+      uColor2 = gl.getUniformLocation(program, "u_color2");
+      uNoiseSpeed = gl.getUniformLocation(program, "u_noiseSpeed");
+      uNoiseSize = gl.getUniformLocation(program, "u_noiseSize");
 
       // get position attribute location in shader
       const position = gl.getAttribLocation(program, "a_position");
@@ -223,6 +252,24 @@
         red1 / sliderMax,
         green1 / sliderMax,
         blue1 / sliderMax
+      );
+      const red2 = parseFloat(document.getElementById("red2").value);
+      const green2 = parseFloat(document.getElementById("green2").value);
+      const blue2 = parseFloat(document.getElementById("blue2").value);
+      gl.uniform3f(
+        uColor2,
+        red2 / sliderMax,
+        green2 / sliderMax,
+        blue2 / sliderMax
+      );
+
+      gl.uniform1f(
+        uNoiseSpeed,
+        parseFloat(document.getElementById("noisespeed").value) * 0.00005
+      );
+      gl.uniform1f(
+        uNoiseSize,
+        parseFloat(document.getElementById("noisesize").value) / 5
       );
 
       // draw triangles using the array buffer from index 0 to 6 (6 is count)
