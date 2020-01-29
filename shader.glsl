@@ -1,3 +1,15 @@
+/*
+Features:
+- Sin oscillators (done)
+- Square wave oscillator (done)
+- RGB controls (done)
+- Noise generator (done)
+- Triangle oscillator (done)
+- Color inversion (done)
+- Luma inversion (done)
+- Luma keying (done)
+*/
+
 #ifdef GL_ES
 precision mediump float;
 #endif
@@ -9,18 +21,6 @@ uniform mediump vec3 u_color1;
 uniform mediump vec3 u_color2;
 
 const float pi = 3.14159265358979323846;
-
-/*
-Features:
-- Sin oscillators (done)
-- Square wave oscillator (done)
-- RGB controls (done)
-- Noise generator (done)
-- Triangle oscillator
-- Color inversion (done)
-- Luma inversion (done)
-- Luma keying (done)
-*/
 
 float sinOscillator(float c, float freq) {
   return (1.0 + sin(pi / 2.0 + c * freq * pi)) / 2.0;
@@ -54,6 +54,7 @@ void main() {
   
   float triangleFreqScalar = 8.0;
   float noiseSpeed = 0.2;
+  float noiseLevel = 1.0;
   
   // horizontal sin waves used for luma
   float hSinAmplitude = 1.0;
@@ -80,6 +81,6 @@ void main() {
   
   // the mod in random is because the randomizer does strange things with a large time
   // triangle oscillator used to control noise
-  float noise = 1.0 - random(p + mod(u_time, 1.0)) * triangleOscillator(p.y + u_time * noiseSpeed, triangleFreqScalar);
+  float noise = 1.0 - noiseLevel * random(p + mod(u_time, 1.0)) * triangleOscillator(p.y + u_time * noiseSpeed, triangleFreqScalar);
   gl_FragColor = vec4(noise * color, 1.0);
 }
