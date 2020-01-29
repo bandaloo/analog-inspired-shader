@@ -25,22 +25,16 @@
         <input type="range" min="0.0" max="255.0" value="0.0" id="green2" />
         <input type="range" min="0.0" max="255.0" value="255.0" id="blue2" />
       </div>
-      <h2>noise speed and size</h2>
+      <h2>noise speed and frequency</h2>
       <div>
         <input
           type="range"
           min="0.0"
           max="255.0"
-          value="127.0"
+          value="30.0"
           id="noisespeed"
         />
-        <input
-          type="range"
-          min="0.0"
-          max="255.0"
-          value="127.0"
-          id="noisesize"
-        />
+        <input type="range" min="0.0" max="255.0" value="30.0" id="noisesize" />
       </div>
 
       <h2>x and y sin</h2>
@@ -50,8 +44,8 @@
       </div>
       <h2>x and y square</h2>
       <div>
-        <input type="range" min="0.0" max="8.0" value="4.0" id="squarex" />
-        <input type="range" min="0.0" max="8.0" value="4.0" id="squarey" />
+        <input type="range" min="0.0" max="8.0" value="1.0" id="squarex" />
+        <input type="range" min="0.0" max="8.0" value="1.0" id="squarey" />
       </div>
     </div>
   </body>
@@ -125,10 +119,10 @@
       float hFrequency = 2.0;
       float vFrequency = 2.0;
 
-      float sinFreqScalarX = 4.0;
-      float sinFreqScalarY = 4.0;
-      float squareFreqScalarX = 1.0;
-      float squareFreqScalarY = 1.0;
+      float sinFreqScalarX = u_sinX; // originally 4
+      float sinFreqScalarY = u_sinY;
+      float squareFreqScalarX = u_squareX; // originally 1
+      float squareFreqScalarY = u_squareY;
 
       float triangleFreqScalar = u_noiseSize;
       float noiseSpeed = u_noiseSpeed;
@@ -166,7 +160,16 @@
 
   <script type="text/javascript">
     // "global" variables
-    let gl, uTime, uColor1, uColor2, uNoiseSpeed, uNoiseSize;
+    let gl,
+      uTime,
+      uColor1,
+      uColor2,
+      uNoiseSpeed,
+      uNoiseSize,
+      uSinX,
+      uSinY,
+      uSquareX,
+      uSquareY;
 
     window.onload = function() {
       const canvas = document.getElementById("gl");
@@ -234,8 +237,14 @@
       // find a pointer to the uniform for the colors
       uColor1 = gl.getUniformLocation(program, "u_color1");
       uColor2 = gl.getUniformLocation(program, "u_color2");
+
+      // find a pointer to the other uniforms needed for sliders
       uNoiseSpeed = gl.getUniformLocation(program, "u_noiseSpeed");
       uNoiseSize = gl.getUniformLocation(program, "u_noiseSize");
+      uSinX = gl.getUniformLocation(program, "u_sinX");
+      uSinY = gl.getUniformLocation(program, "u_sinY");
+      uSquareX = gl.getUniformLocation(program, "u_squareX");
+      uSquareY = gl.getUniformLocation(program, "u_squareY");
 
       // get position attribute location in shader
       const position = gl.getAttribLocation(program, "a_position");
@@ -285,9 +294,21 @@
         uNoiseSpeed,
         parseFloat(document.getElementById("noisespeed").value) * 0.00005
       );
+
       gl.uniform1f(
         uNoiseSize,
         parseFloat(document.getElementById("noisesize").value) / 5
+      );
+
+      gl.uniform1f(uSinX, parseFloat(document.getElementById("sinx").value));
+      gl.uniform1f(uSinY, parseFloat(document.getElementById("siny").value));
+      gl.uniform1f(
+        uSquareX,
+        parseFloat(document.getElementById("squarex").value)
+      );
+      gl.uniform1f(
+        uSquareY,
+        parseFloat(document.getElementById("squarey").value)
       );
 
       // draw triangles using the array buffer from index 0 to 6 (6 is count)

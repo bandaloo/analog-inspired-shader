@@ -1,0 +1,17 @@
+h1,
+h2,
+h3,
+header,
+p {
+  color: #bababa;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+.controlbox {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  z-index: 1;
+  margin-left: 16px;
+  text-shadow: 2px 2px 4px black;
+}
