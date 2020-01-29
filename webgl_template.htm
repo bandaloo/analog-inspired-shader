@@ -32,6 +32,18 @@
 
   <!-- fragment shader -->
   <script id="fragment" type="x-shader/x-fragment">
+    /*
+    Features:
+    - Sin oscillators (done)
+    - Square wave oscillator (done)
+    - RGB controls (done)
+    - Noise generator (done)
+    - Triangle oscillator (done)
+    - Color inversion (done)
+    - Luma inversion (done)
+    - Luma keying (done)
+    */
+
     #ifdef GL_ES
     precision mediump float;
     #endif
@@ -44,18 +56,6 @@
 
     const float pi = 3.14159265358979323846;
 
-    /*
-    Features:
-    - Sin oscillators (done)
-    - Square wave oscillator (done)
-    - RGB controls (done)
-    - Noise generator (done)
-    - Triangle oscillator
-    - Color inversion (done)
-    - Luma inversion (done)
-    - Luma keying (done)
-    */
-
     float sinOscillator(float c, float freq) {
       return (1.0 + sin(pi / 2.0 + c * freq * pi)) / 2.0;
     }
@@ -64,13 +64,16 @@
       return step(mod(c * freq, 1.0), 0.5);
     }
 
+    float triangleOscillator(float c, float freq) {
+      return mod(c * freq, 1.0);
+    }
+
     // random function is from Book of Shaders
     float random(vec2 st) {
       return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
     }
 
     void main() {
-      // TODO make uniform
       const float brightness = 1.0;
       vec2 p = gl_FragCoord.xy / u_resolution.xy;
 
@@ -82,6 +85,10 @@
 
       float sinFreqScalar = 4.0;
       float squareFreqScalar = 1.0;
+
+      float triangleFreqScalar = 8.0;
+      float noiseSpeed = 0.001;
+      float noiseLevel = 1.0;
 
       // horizontal sin waves used for luma
       float hSinAmplitude = 1.0;
@@ -107,7 +114,9 @@
       //color = mix(vec3(color), color2, hSin);
 
       // the mod in random is because the randomizer does strange things with a large time
-      gl_FragColor = vec4(random(p + mod(u_time / 1000.0, 1.0)) * color, 1.0);
+      // triangle oscillator used to control noise
+      float noise = 1.0 - noiseLevel * random(p + mod(u_time / 1000.0, 1.0)) * triangleOscillator(p.y + u_time * noiseSpeed, triangleFreqScalar);
+      gl_FragColor = vec4(noise * color, 1.0);
     }
   </script>
 
