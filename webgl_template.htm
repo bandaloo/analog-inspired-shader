@@ -10,6 +10,12 @@
   <body>
     <canvas id="gl"></canvas>
     <div>
+      <!-- first rgb selector -->
+      <input type="range" min="0.0" max="255.0" value="255.0" id="red1" />
+      <input type="range" min="0.0" max="255.0" value="0.0" id="green1" />
+      <input type="range" min="0.0" max="255.0" value="0.0" id="blue1" />
+
+      <!-- second rgb selector -->
       <input type="range" min="0.0" max="255.0" value="255.0" id="red1" />
       <input type="range" min="0.0" max="255.0" value="0.0" id="green1" />
       <input type="range" min="0.0" max="255.0" value="0.0" id="blue1" />
@@ -101,7 +107,7 @@
       //color = mix(vec3(color), color2, hSin);
 
       // the mod in random is because the randomizer does strange things with a large time
-      gl_FragColor = vec4(random(p + mod(u_time, 1.0)) * color, 1.0);
+      gl_FragColor = vec4(random(p + mod(u_time / 1000.0, 1.0)) * color, 1.0);
     }
   </script>
 

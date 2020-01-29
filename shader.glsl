@@ -30,13 +30,16 @@ float squareOscillator(float c, float freq) {
   return step(mod(c * freq, 1.0), 0.5);
 }
 
+float triangleOscillator(float c, float freq) {
+  return mod(c * freq, 1.0);
+}
+
 // random function is from Book of Shaders
 float random(vec2 st) {
   return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
 void main() {
-  // TODO make uniform
   const float brightness = 1.0;
   vec2 p = gl_FragCoord.xy / u_resolution.xy;
   
@@ -48,6 +51,9 @@ void main() {
   
   float sinFreqScalar = 4.0;
   float squareFreqScalar = 1.0;
+  
+  float triangleFreqScalar = 8.0;
+  float noiseSpeed = 0.2;
   
   // horizontal sin waves used for luma
   float hSinAmplitude = 1.0;
@@ -73,5 +79,7 @@ void main() {
   //color = mix(vec3(color), color2, hSin);
   
   // the mod in random is because the randomizer does strange things with a large time
-  gl_FragColor = vec4(random(p + mod(u_time, 1.0)) * color, 1.0);
+  // triangle oscillator used to control noise
+  float noise = 1.0 - random(p + mod(u_time, 1.0)) * triangleOscillator(p.y + u_time * noiseSpeed, triangleFreqScalar);
+  gl_FragColor = vec4(noise * color, 1.0);
 }
