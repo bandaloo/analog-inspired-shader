@@ -31,16 +31,27 @@
           type="range"
           min="0.0"
           max="255.0"
-          value="255.0"
+          value="127.0"
           id="noisespeed"
         />
         <input
           type="range"
           min="0.0"
           max="255.0"
-          value="255.0"
+          value="127.0"
           id="noisesize"
         />
+      </div>
+
+      <h2>x and y sin</h2>
+      <div>
+        <input type="range" min="0.0" max="8.0" value="4.0" id="sinx" />
+        <input type="range" min="0.0" max="8.0" value="4.0" id="siny" />
+      </div>
+      <h2>x and y square</h2>
+      <div>
+        <input type="range" min="0.0" max="8.0" value="4.0" id="squarex" />
+        <input type="range" min="0.0" max="8.0" value="4.0" id="squarey" />
       </div>
     </div>
   </body>
@@ -80,6 +91,11 @@
     uniform mediump float u_noiseSpeed;
     uniform mediump float u_noiseSize;
 
+    uniform mediump float u_sinX;
+    uniform mediump float u_sinY;
+    uniform mediump float u_squareX;
+    uniform mediump float u_squareY;
+
     const float pi = 3.14159265358979323846;
 
     float sinOscillator(float c, float freq) {
@@ -109,8 +125,10 @@
       float hFrequency = 2.0;
       float vFrequency = 2.0;
 
-      float sinFreqScalar = 4.0;
-      float squareFreqScalar = 1.0;
+      float sinFreqScalarX = 4.0;
+      float sinFreqScalarY = 4.0;
+      float squareFreqScalarX = 1.0;
+      float squareFreqScalarY = 1.0;
 
       float triangleFreqScalar = u_noiseSize;
       float noiseSpeed = u_noiseSpeed;
@@ -118,19 +136,19 @@
 
       // horizontal sin waves used for luma
       float hSinAmplitude = 1.0;
-      float hSin = hSinAmplitude * sinOscillator(p.x, hFrequency * sinFreqScalar);
+      float hSin = hSinAmplitude * sinOscillator(p.x, hFrequency * sinFreqScalarX);
 
       // vertical sin waves used for chroma keying
       float vSinAmplitude = 1.0;
-      float vSin = vSinAmplitude * sinOscillator(p.y, vFrequency * sinFreqScalar);
+      float vSin = vSinAmplitude * sinOscillator(p.y, vFrequency * sinFreqScalarY);
 
       // horizontal square wave used for color inversion
       float hSquareAmplitude = 1.0;
-      float hSquare = hSquareAmplitude * squareOscillator(p.x, hFrequency * squareFreqScalar);
+      float hSquare = hSquareAmplitude * squareOscillator(p.x, hFrequency * squareFreqScalarX);
 
       // vertical square wave used for luma inversion
       float vSquareAmplitude = 1.0;
-      float vSquare = vSquareAmplitude * squareOscillator(p.y, vFrequency * squareFreqScalar);
+      float vSquare = vSquareAmplitude * squareOscillator(p.y, vFrequency * squareFreqScalarY);
 
       // luma is used to mix between colors
       float luma = vSquare - sign(vSquare - 0.5) * brightness * hSin * vSin;
